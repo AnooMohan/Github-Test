@@ -9,6 +9,9 @@ on:
     paths:
       - 'src/**'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -16,14 +19,16 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Show trigger
-        run: echo "Triggered by ${{ github.event_name }}"
-
       - name: Run tests
         run: echo "Tests passed"
 
   build:
     needs: test
+
+    permissions:
+      contents: read
+      packages: write
+
     runs-on: ubuntu-latest
 
     steps:
@@ -39,28 +44,35 @@ jobs:
         with:
           name: web-dist
           path: dist/
-          
- deploy-demo:
-  needs: build
-  runs-on: ubuntu-latest
+          retention-days: 7
 
-  env:
-    REGION: ${{ vars.DEPLOY_REGION }}
+  deploy-demo:
+    needs: build
 
-  steps:
-    - name: Download build output
-      uses: actions/download-artifact@v7
-      with:
-        name: web-dist
-        path: ./dist
+    permissions:
+      contents: read
 
-    - name: Show deployment configuration
-      run: echo "Deploying to $REGION"
+    runs-on: ubuntu-latest
 
-    - name: Inspect build output
-      run: |
-        ls -R dist
-        cat dist/index.html
+    env:
+      REGION: ${{ vars.DEPLOY_REGION }}
 
-    - name: Deploy
-      run: echo "Deploying application"
+    steps:
+      - name: Download build output
+        uses: actions/download-artifact@v7
+        with:
+          name: web-dist
+          path: ./dist
+
+      - name: Show deployment configuration
+        run: echo "Deploying to $REGION"
+
+      - name: Verify deployment token
+        env:
+          TOKEN: ${{ secrets.DEMO_TOKEN }}
+        run: |
+          echo "A deployment token was provided"
+          test -n "$TOKEN"
+
+      - name: Deploy
+        run: echo "Deploying application"
