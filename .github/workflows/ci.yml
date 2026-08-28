@@ -39,6 +39,7 @@ jobs:
         with:
           name: web-dist
           path: dist/
+          
  deploy-demo:
   needs: build
   runs-on: ubuntu-latest
@@ -62,4 +63,4 @@ jobs:
         cat dist/index.html
 
     - name: Deploy
-      run: echo "Deploying application" 
+      run: echo "Deploying application"
