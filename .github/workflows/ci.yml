@@ -39,29 +39,27 @@ jobs:
         with:
           name: web-dist
           path: dist/
-          
-  deploy-demo:
-    needs: build
-    runs-on: ubuntu-latest
+ deploy-demo:
+  needs: build
+  runs-on: ubuntu-latest
 
-    steps:
-      - name: Download build output
-        uses: actions/download-artifact@v7
-        with:
-          name: web-dist
-          path: ./dist
+  env:
+    REGION: ${{ vars.DEPLOY_REGION }}
 
-      - name: Inspect build output
-        run: |
-          ls -R dist
-          cat dist/index.html
+  steps:
+    - name: Download build output
+      uses: actions/download-artifact@v7
+      with:
+        name: web-dist
+        path: ./dist
 
-      - name: Deploy
-        run: echo "Deploying application"
-        
-      - name: Upload build output
-        uses: actions/upload-artifact@v7
-        with:
-         name: web-dist
-         path: dist/
-         retention-days: 7
+    - name: Show deployment configuration
+      run: echo "Deploying to $REGION"
+
+    - name: Inspect build output
+      run: |
+        ls -R dist
+        cat dist/index.html
+
+    - name: Deploy
+      run: echo "Deploying application" 
