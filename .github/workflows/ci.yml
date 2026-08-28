@@ -13,3 +13,5 @@ jobs:
           echo "Hello from GitHub Actions"
           uname -a
           pwd
+      - name: List files
+        run: ls -la
