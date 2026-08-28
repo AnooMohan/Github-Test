@@ -9,6 +9,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+      
       - name: Show environment
         run: |
           echo "Hello from GitHub Actions"
